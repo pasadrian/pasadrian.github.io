@@ -63,41 +63,38 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
-        
-        // --- 1. POPRAWKA ODZWOROWANIA KOLORÓW ---
-        renderer.outputColorSpace = THREE.SRGBColorSpace; 
-        
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // --- 2. ZWIĘKSZONA INTENSYWNOŚĆ OŚWIETLENIA ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
-        scene.add(ambientLight);
+        // --- 1. OŚWIETLENIE BEZCIENIOWE (Z KAŻDEJ STRONY) ---
+        // Światło z nieba i ziemi – eliminuje czarne cienie od dołu i z boku
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2.5);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
 
-        const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.5);
-        dirLight1.position.set(5, 10, 7);
-        scene.add(dirLight1);
+        // Światło mocne wprost z pozycji kamery
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(1, 1, 2);
+        scene.add(dirLight);
 
-        const dirLight2 = new THREE.DirectionalLight(0xffffff, 1.5);
-        dirLight2.position.set(-5, -5, -5);
-        scene.add(dirLight2);
-
-        // Ładowanie pliku .glb
+        // --- 2. ŁADOWANIE MODELU I POPRAWKA MATERIAŁÓW ---
         const loader = new THREE.GLTFLoader();
         
         loader.load('ramie_robota.glb', function (gltf) {
             const model = gltf.scene;
 
-            // --- 3. ROZJAŚNIENIE MATERIAŁÓW PLASTIKU ---
+            // Wymuszenie matowego plastiku i usunięcie sztucznych czarnych odbić
             model.traverse((child) => {
                 if (child.isMesh && child.material) {
-                    child.material.roughness = 0.4;
+                    child.material.metalness = 0.1; // Wyłączenie odbić metalicznych
+                    child.material.roughness = 0.6; // Matowy plastik zamiast błyszczącego
                 }
             });
 
-            // Automatyczne środkowanie i skalowanie kamery
+            // Wyśrodkowanie modelu
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
@@ -108,12 +105,20 @@
 
             scene.add(model);
 
+            // --- 3. USTAWIENIE KAMERY BARDZIEJ Z BOKU I BLIŻEJ ---
             const maxDim = Math.max(size.x, size.y, size.z);
-            camera.position.set(maxDim * 1.5, maxDim * 1.2, maxDim * 1.5);
-            camera.lookAt(0, 0, 0);
+            
+            // Kamera bliżej (1.0 zamiast 1.5) oraz na wysokości środka modelu
+            camera.position.set(maxDim * 1.1, maxDim * 0.3, maxDim * 0.8);
+            controls.target.set(0, 0, 0);
+            controls.update();
 
             function animate() {
                 requestAnimationFrame(animate);
+                
+                // Światło podąża za kamerą – model jest zawsze idealnie doświetlony z przodu
+                dirLight.position.copy(camera.position);
+                
                 controls.update();
                 renderer.render(scene, camera);
             }
@@ -128,6 +133,5 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
         });
     </script>
-
 </body>
 </html>
