@@ -4,12 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adrian Paś - Portfolio</title>
+
+    <!-- Biblioteki Three.js do obsługi i wyświetlania modeli STL w przeglądarce -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 40px; background-color: #0d1117; color: #c9d1d9; }
         header { text-align: center; margin-bottom: 60px; }
         h1 { color: #58a6ff; }
-        .project { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 50px; background: #161b22; padding: 20px; border-radius: 8px; }
-        .project img { width: 100%; max-width: 400px; border-radius: 6px; object-fit: cover; }
+        .project { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 50px; background: #161b22; padding: 20px; border-radius: 8px; align-items: center; }
+        
+        /* Styl dla kontenera z modelem 3D */
+        .model-container { 
+            width: 100%; 
+            max-width: 400px; 
+            height: 300px; 
+            background-color: #0d1117; 
+            border-radius: 6px; 
+            overflow: hidden;
+            cursor: grab;
+        }
+        .model-container:active {
+            cursor: grabbing;
+        }
+
         .project-info { flex: 1; min-width: 280px; }
         .tech-stack span { background: #21262d; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; color: #8b949e; }
         a.btn { display: inline-block; margin-top: 15px; padding: 8px 16px; background: #238636; color: white; text-decoration: none; border-radius: 6px; }
@@ -25,21 +45,91 @@
     <main>
         <!-- PROJEKT 1 -->
         <section class="project">
-            <img src="https://via.placeholder.com/400x250" alt="Podgląd projektu">
+            <!-- Miejsce na interaktywny model 3D po lewej stronie -->
+            <div id="robot-3d-viewer" class="model-container"></div>
+
             <div class="project-info">
-                <h2>Nazwa Projektu 1</h2>
+                <h2>3D printed 6 axis robotic arm</h2>
                 <p>Krótki opis tego, co robi aplikacja, jaki problem rozwiązuje i czego się przy niej nauczyłeś.</p>
                 <div class="tech-stack">
-                    <span>HTML</span><span>CSS</span><span>JavaScript</span>
+                    <span>C++ / STM32</span><span>Python</span><span>3D Printing / CAD</span>
                 </div>
                 <br>
-                <a href="LINK_DO_REPOZYTORIUM" class="btn" target="_blank">Zobacz na GitHubie</a>
+                <a href="https://github.com/pasadrian/6-axis-robot-arm" class="btn" target="_blank">Zobacz kod i modele 3D na GitHubie</a>
             </div>
         </section>
 
         <!-- PROJEKT 2 -->
         <!-- Tutaj wklejasz kolejny blok .project -->
     </main>
+
+    <!-- SKRYPT INICJALIZUJĄCY MODEL 3D -->
+    <script>
+        const container = document.getElementById('robot-3d-viewer');
+
+        // 1. Scena, Kamera i Renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // 2. Sterowanie myszką (obracanie, przybliżanie)
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // 3. Oświetlenie
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight1.position.set(1, 1, 1);
+        scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+        dirLight2.position.set(-1, -1, -1);
+        scene.add(dirLight2);
+
+        // 4. Wczytywanie pliku STL
+        const loader = new THREE.STLLoader();
+        
+        // PAMIĘTAJ: Zmień 'robot.stl' na rzeczywistą nazwę/ścieżkę do Twojego pliku STL na serwerze!
+        loader.load('robot.stl', function (geometry) {
+            
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0x58a6ff, 
+                specular: 0x111111, 
+                shininess: 100 
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+
+            // Wyśrodkowanie modelu i ustawienie kamery
+            geometry.center();
+            scene.add(mesh);
+
+            geometry.computeBoundingSphere();
+            const radius = geometry.boundingSphere.radius;
+            camera.position.set(radius * 1.8, radius * 1.2, radius * 1.8);
+            camera.lookAt(0, 0, 0);
+
+            // Pętla renderowania animacji
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        });
+
+        // Responsywność okienka 3D przy zmianie rozmiaru ekranu
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
 
 </body>
 </html>
