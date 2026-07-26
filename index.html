@@ -20,7 +20,7 @@
             width: 100%; 
             max-width: 400px; 
             height: 300px; 
-            background-color: #62686e; 
+            background-color: #33373a; 
             border-radius: 6px; 
             overflow: hidden;
             cursor: grab;
@@ -93,7 +93,12 @@
                 }
             });
 
-            // Wyśrodkowanie modelu
+            // --- OBRÓT MODELI WOKÓŁ OSI PIONOWEJ (Y) ---
+            // Obrót o ok. 45 stopni (Math.PI / 4) zgodnie z ruchem wskazówek zegara
+            // Jeśli to za mało lub za dużo, zmień wartość np. na Math.PI / 2 (90 deg) lub -Math.PI / 4
+            model.rotation.y = -Math.PI / 4; 
+
+            // Wyśrodkowanie
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
@@ -104,11 +109,9 @@
 
             scene.add(model);
 
-            // --- 3. USTAWIENIE KAMERY BARDZIEJ Z BOKU I BLIŻEJ ---
+            // Ustawienie kamery bliżej profilu
             const maxDim = Math.max(size.x, size.y, size.z);
-            
-            // Kamera bliżej (1.0 zamiast 1.5) oraz na wysokości środka modelu
-            camera.position.set(maxDim * 1.1, maxDim * 0.3, maxDim * 0.8);
+            camera.position.set(maxDim * 1.2, maxDim * 0.4, maxDim * 1.0);
             controls.target.set(0, 0, 0);
             controls.update();
 
