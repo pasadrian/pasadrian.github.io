@@ -1,41 +1,56 @@
 <!DOCTYPE html>
-<!-- Ustawiamy domyślny język atrybutem lang -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adrian Paś - Portfolio</title>
 
-    <!-- Importujemy stylizację z osobnego pliku -->
+    <!-- Plik ze stylami -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- Biblioteki Three.js oraz GLTFLoader -->
+    <!-- Biblioteki Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
-<!-- Domyślnie ładujemy stronę z klasą lang-en -->
 <body class="lang-en">
 
     <header>
-        <!-- --- PRZYCISKI JĘZYKOWE --- -->
+        <!-- PRZYCISKI PL / EN -->
         <div class="lang-switch">
             <button class="lang-btn active" id="btn-en">EN</button>
             <button class="lang-btn" id="btn-pl">PL</button>
         </div>
 
         <h1>Adrian Paś</h1>
-        <!-- Przykład tłumaczenia w nagłówku -->
-        <p class="lang-en">My Projects & Portfolio</p>
-        <p class="lang-pl">Moje projekty i portfolio</p>
+        <p class="lang-en">Programming Enthusiast | My Projects & Portfolio</p>
+        <p class="lang-pl">Pasjonat programowania | Moje projekty i portfolio</p>
     </header>
 
     <main>
-        <!-- Tu JavaScript wczyta pliki HTML z folderu /projects -->
-        <div id="projects-container"></div>
+        <!-- SEKCJA PROJEKTU 1 -->
+        <section class="project">
+            <div id="robot-3d-viewer" class="model-container"></div>
+
+            <div class="project-info">
+                <h2 class="lang-en">3D printed 6 axis robotic arm</h2>
+                <h2 class="lang-pl">Drukowane 3D 6-osiowe ramię robotyczne</h2>
+
+                <p class="lang-en">Short description of what the application does, what problem it solves, and what you learned during development.</p>
+                <p class="lang-pl">Krótki opis tego, co robi aplikacja, jaki problem rozwiązuje i czego się przy niej nauczyłeś.</p>
+
+                <div class="tech-stack">
+                    <span>C++ / STM32</span><span>Python</span><span>3D Printing / CAD</span>
+                </div>
+                <br>
+
+                <a href="https://github.com/pasadrian/6-axis-robot-arm" class="btn lang-en" target="_blank">View Code & 3D Models on GitHub</a>
+                <a href="https://github.com/pasadrian/6-axis-robot-arm" class="btn lang-pl" target="_blank">Zobacz kod i modele 3D na GitHubie</a>
+            </div>
+        </section>
     </main>
 
-    <!-- Importujemy logikę z osobnego pliku -->
+    <!-- Główny skrypt logiczny i Three.js -->
     <script src="script.js"></script>
 
 </body>
