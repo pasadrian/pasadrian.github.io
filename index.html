@@ -1,148 +1,42 @@
 <!DOCTYPE html>
-<html lang="pl">
+<!-- Ustawiamy domyślny język atrybutem lang -->
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adrian Paś - Portfolio</title>
 
-    <!-- Biblioteki Three.js oraz GLTFLoader (dla plików .glb z kolorami) -->
+    <!-- Importujemy stylizację z osobnego pliku -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Biblioteki Three.js oraz GLTFLoader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 40px; background-color: #0d1117; color: #c9d1d9; }
-        header { text-align: center; margin-bottom: 60px; }
-        h1 { color: #58a6ff; }
-        .project { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 50px; background: #161b22; padding: 20px; border-radius: 8px; align-items: center; }
-        
-        .model-container { 
-            width: 100%; 
-            max-width: 400px; 
-            height: 300px; 
-            background-color: #33373a; 
-            border-radius: 6px; 
-            overflow: hidden;
-            cursor: grab;
-        }
-        .model-container:active { cursor: grabbing; }
-
-        .project-info { flex: 1; min-width: 280px; }
-        .tech-stack span { background: #21262d; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; color: #8b949e; }
-        a.btn { display: inline-block; margin-top: 15px; padding: 8px 16px; background: #238636; color: white; text-decoration: none; border-radius: 6px; }
-    </style>
 </head>
-<body>
+<!-- Domyślnie ładujemy stronę z klasą lang-en -->
+<body class="lang-en">
 
     <header>
+        <!-- --- PRZYCISKI JĘZYKOWE --- -->
+        <div class="lang-switch">
+            <button class="lang-btn active" id="btn-en">EN</button>
+            <button class="lang-btn" id="btn-pl">PL</button>
+        </div>
+
         <h1>Adrian Paś</h1>
-        <p>Moje projekty i portfolio</p>
+        <!-- Przykład tłumaczenia w nagłówku -->
+        <p class="lang-en">My Projects & Portfolio</p>
+        <p class="lang-pl">Moje projekty i portfolio</p>
     </header>
 
     <main>
-        <section class="project">
-            <div id="robot-3d-viewer" class="model-container"></div>
-
-            <div class="project-info">
-                <h2>6 osiowy robot wydrukowany w technologii 3D</h2>
-                <p>Krótki opis tego, co robi aplikacja, jaki problem rozwiązuje i czego się przy niej nauczyłeś.</p>
-                <div class="tech-stack">
-                    <span>STM32</span><span>Python</span><span>3D Printing / FreeCAD</span>
-                </div>
-                <br>
-                <a href="https://github.com/pasadrian/6-axis-robot-arm" class="btn" target="_blank">Zobacz kod i modele 3D na GitHubie</a>
-            </div>
-        </section>
+        <!-- Tu JavaScript wczyta pliki HTML z folderu /projects -->
+        <div id="projects-container"></div>
     </main>
 
-    <script>
-        const container = document.getElementById('robot-3d-viewer');
+    <!-- Importujemy logikę z osobnego pliku -->
+    <script src="script.js"></script>
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.outputColorSpace = THREE.SRGBColorSpace;
-        container.appendChild(renderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-
-        // --- 1. NATURALNE ŚWIATŁO SŁONECZNE (Daje głębię zamiast plasteliny) ---
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 0.6);
-        scene.add(hemiLight);
-
-        // Główne światło padające z góry pod kątem
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(5, 12, 8);
-        scene.add(dirLight);
-
-        // Wypełniające, słabsze światło z tyłu
-        const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
-        backLight.position.set(-5, -5, -5);
-        scene.add(backLight);
-
-        const loader = new THREE.GLTFLoader();
-        
-        loader.load('ramie_robota.glb', function (gltf) {
-            const model = gltf.scene;
-
-            // --- 2. DODANIE KONTURÓW CAD ORAZ POPRAWKA MATERIALU ---
-            model.traverse((child) => {
-                if (child.isMesh) {
-                    // Przywrócenie materiałowi lekkości (tworzy delikatne bliki na krawędziach)
-                    if (child.material) {
-                        child.material.metalness = 0.1;
-                        child.material.roughness = 0.4;
-                    }
-
-                    // Tworzenie obrysów/konturów krawędzi (CAD Edges)
-                    const edges = new THREE.EdgesGeometry(child.geometry, 25); // 25 deg = kąt zagniecenia krawędzi
-                    const lineMaterial = new THREE.LineBasicMaterial({ 
-                        color: 0x111111, // Ciemne linie konturu
-                        linewidth: 1 
-                    });
-                    const wireframe = new THREE.LineSegments(edges, lineMaterial);
-                    child.add(wireframe);
-                }
-            });
-
-            // Obrót początkowy ze wskazówkami zegara
-            model.rotation.y = -Math.PI / 4; 
-
-            // Wyśrodkowanie
-            const box = new THREE.Box3().setFromObject(model);
-            const center = box.getCenter(new THREE.Vector3());
-            const size = box.getSize(new THREE.Vector3());
-
-            model.position.x += (model.position.x - center.x);
-            model.position.y += (model.position.y - center.y);
-            model.position.z += (model.position.z - center.z);
-
-            scene.add(model);
-
-            // Pozycja kamery
-            const maxDim = Math.max(size.x, size.y, size.z);
-            camera.position.set(maxDim * 1.2, maxDim * 0.4, maxDim * 1.0);
-            controls.target.set(0, 0, 0);
-            controls.update();
-
-            function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }
-            animate();
-        }, undefined, function (error) {
-            console.error('Błąd ładowania pliku 3D:', error);
-        });
-
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-    </script>
 </body>
 </html>
