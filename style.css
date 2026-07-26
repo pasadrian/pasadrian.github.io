@@ -1,13 +1,11 @@
 /* style.css */
 
-/* 1. Reset i tło całej strony */
-html, body {
-    background-color: #0d1117 !important; /* Wymuszenie ciemnego tła */
-    color: #c9d1d9;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 40px;
-    min-height: 100vh;
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 0; 
+    padding: 40px; 
+    background-color: #0d1117; 
+    color: #c9d1d9; 
 }
 
 header { 
@@ -16,9 +14,10 @@ header {
     position: relative; 
 }
 
-h1 { color: #58a6ff; }
+h1 { 
+    color: #58a6ff; 
+}
 
-/* 2. Układ projektów */
 .project { 
     display: flex; 
     flex-wrap: wrap; 
@@ -36,60 +35,70 @@ h1 { color: #58a6ff; }
     height: 300px; 
     background-color: #21262d; 
     border-radius: 6px; 
-    overflow: hidden;
-    cursor: grab;
-}
-.model-container:active { cursor: grabbing; }
-
-.project-info { flex: 1; min-width: 280px; }
-.tech-stack span { background: #21262d; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; color: #8b949e; }
-a.btn { display: inline-block; margin-top: 15px; padding: 8px 16px; background: #238636; color: white; text-decoration: none; border-radius: 6px; cursor: pointer; border: none; }
-
-/* 3. Przełącznik języków w prawym górnym rogu */
-.lang-switch {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    gap: 5px;
+    overflow: hidden; 
+    cursor: grab; 
 }
 
-.lang-btn {
-    background: #21262d;
-    color: #8b949e;
-    border: 1px solid #30363d;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
+.model-container:active { 
+    cursor: grabbing; 
 }
 
-.lang-btn.active {
-    background: #238636;
-    color: #ffffff;
-    border-color: #2e9e44;
+.project-info { 
+    flex: 1; 
+    min-width: 280px; 
 }
 
-/* 4. LOGIKA POKAZYWANIA / UKRYWANIA JĘZYKÓW */
-
-/* Domyślnie ukrywamy WSZYSTKO co ma klasę języka */
-.lang-pl, .lang-en {
-    display: none !important;
+.tech-stack span { 
+    background: #21262d; 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    margin-right: 5px; 
+    color: #8b949e; 
 }
 
-/* Gdy body ma klasę lang-en -> POKAŻ elementy lang-en */
-body.lang-en .lang-en {
-    display: initial !important; /* Przywraca naturalny typ wyświetlania (blokowy dla <p>/<h2>, liniowy dla <span>) */
+a.btn { 
+    display: inline-block; 
+    margin-top: 15px; 
+    padding: 8px 16px; 
+    background: #238636; 
+    color: white; 
+    text-decoration: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    border: none; 
 }
 
-/* Gdy body ma klasę lang-pl -> POKAŻ elementy lang-pl */
-body.lang-pl .lang-pl {
-    display: initial !important;
+/* Przełącznik językowy */
+.lang-switch { 
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    display: flex; 
+    gap: 5px; 
 }
 
-/* Wyjątek dla przycisków <a>, żeby zachowały ładny wygląd */
-body.lang-en a.btn.lang-en,
-body.lang-pl a.btn.lang-pl {
-    display: inline-block !important;
+.lang-btn { 
+    background: #21262d; 
+    color: #8b949e; 
+    border: 1px solid #30363d; 
+    padding: 5px 10px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 12px; 
+}
+
+.lang-btn.active { 
+    background: #58a6ff; 
+    color: #ffffff; 
+    border-color: #58a6ff; 
+}
+
+/* Ukrywanie nieaktywnego języka */
+body.lang-en .lang-pl { 
+    display: none !important; 
+}
+
+body.lang-pl .lang-en { 
+    display: none !important; 
 }

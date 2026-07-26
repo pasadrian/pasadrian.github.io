@@ -4,29 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adrian Paś - Portfolio</title>
+    
+    <link rel="stylesheet" href="style.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 40px; background-color: #0d1117; color: #c9d1d9; }
-        header { text-align: center; margin-bottom: 60px; position: relative; }
-        h1 { color: #58a6ff; }
-        .project { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 50px; background: #161b22; padding: 20px; border-radius: 8px; align-items: center; }
-        .model-container { width: 100%; max-width: 400px; height: 300px; background-color: #21262d; border-radius: 6px; overflow: hidden; cursor: grab; }
-        .model-container:active { cursor: grabbing; }
-        .project-info { flex: 1; min-width: 280px; }
-        .tech-stack span { background: #21262d; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; color: #8b949e; }
-        a.btn { display: inline-block; margin-top: 15px; padding: 8px 16px; background: #238636; color: white; text-decoration: none; border-radius: 6px; cursor: pointer; border: none; }
-
-        /* Przełącznik językowy */
-        .lang-switch { position: absolute; top: 0; right: 0; display: flex; gap: 5px; }
-        .lang-btn { background: #21262d; color: #8b949e; border: 1px solid #30363d; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .lang-btn.active { background: #58a6ff; color: #ffffff; border-color: #58a6ff; }
-
-        /* Proste ukrywanie języków */
-        body.lang-en .lang-pl { display: none !important; }
-        body.lang-pl .lang-en { display: none !important; }
-    </style>
 </head>
 <body class="lang-en">
 
