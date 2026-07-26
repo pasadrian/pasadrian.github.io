@@ -36,7 +36,7 @@
 
     <header>
         <h1>Adrian Paś</h1>
-        <p>Pasjonat programowania | Moje projekty i portfolio</p>
+        <p>Moje projekty i portfolio</p>
     </header>
 
     <main>
@@ -44,10 +44,10 @@
             <div id="robot-3d-viewer" class="model-container"></div>
 
             <div class="project-info">
-                <h2>3D printed 6 axis robotic arm</h2>
+                <h2>6 osiowy robot wydrukowany w technologii 3D</h2>
                 <p>Krótki opis tego, co robi aplikacja, jaki problem rozwiązuje i czego się przy niej nauczyłeś.</p>
                 <div class="tech-stack">
-                    <span>C++ / STM32</span><span>Python</span><span>3D Printing / CAD</span>
+                    <span>STM32</span><span>Python</span><span>3D Printing / FreeCAD</span>
                 </div>
                 <br>
                 <a href="https://github.com/pasadrian/6-axis-robot-arm" class="btn" target="_blank">Zobacz kod i modele 3D na GitHubie</a>
@@ -69,33 +69,46 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // --- 1. NATURALNE, UMIARKOWANE OŚWIETLENIE ---
-        // Obniżona intensywność światła otoczenia z 2.5 na 1.0
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x333333, 1.0);
-        hemiLight.position.set(0, 20, 0);
+        // --- 1. NATURALNE ŚWIATŁO SŁONECZNE (Daje głębię zamiast plasteliny) ---
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 0.6);
         scene.add(hemiLight);
 
-        // Lekkie światło z przodu zbalansowane z 1.5 na 0.8
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(1, 1, 2);
+        // Główne światło padające z góry pod kątem
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 12, 8);
         scene.add(dirLight);
 
-        // --- 2. ZBALANSE-OWANY MATERIAŁ (Mniej rażący) ---
-        const loader = new THREE.GLTFLoader();
+        // Wypełniające, słabsze światło z tyłu
+        const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        backLight.position.set(-5, -5, -5);
+        scene.add(backLight);
 
+        const loader = new THREE.GLTFLoader();
+        
         loader.load('ramie_robota.glb', function (gltf) {
             const model = gltf.scene;
 
+            // --- 2. DODANIE KONTURÓW CAD ORAZ POPRAWKA MATERIALU ---
             model.traverse((child) => {
-                if (child.isMesh && child.material) {
-                    child.material.metalness = 0.0; // Całkowicie wyłączamy sztuczny błysk
-                    child.material.roughness = 0.8; // Zwiększamy szorstkość, aby zieleń nie raziła
+                if (child.isMesh) {
+                    // Przywrócenie materiałowi lekkości (tworzy delikatne bliki na krawędziach)
+                    if (child.material) {
+                        child.material.metalness = 0.1;
+                        child.material.roughness = 0.4;
+                    }
+
+                    // Tworzenie obrysów/konturów krawędzi (CAD Edges)
+                    const edges = new THREE.EdgesGeometry(child.geometry, 25); // 25 deg = kąt zagniecenia krawędzi
+                    const lineMaterial = new THREE.LineBasicMaterial({ 
+                        color: 0x111111, // Ciemne linie konturu
+                        linewidth: 1 
+                    });
+                    const wireframe = new THREE.LineSegments(edges, lineMaterial);
+                    child.add(wireframe);
                 }
             });
 
-            // --- OBRÓT MODELI WOKÓŁ OSI PIONOWEJ (Y) ---
-            // Obrót o ok. 45 stopni (Math.PI / 4) zgodnie z ruchem wskazówek zegara
-            // Jeśli to za mało lub za dużo, zmień wartość np. na Math.PI / 2 (90 deg) lub -Math.PI / 4
+            // Obrót początkowy ze wskazówkami zegara
             model.rotation.y = -Math.PI / 4; 
 
             // Wyśrodkowanie
@@ -109,7 +122,7 @@
 
             scene.add(model);
 
-            // Ustawienie kamery bliżej profilu
+            // Pozycja kamery
             const maxDim = Math.max(size.x, size.y, size.z);
             camera.position.set(maxDim * 1.2, maxDim * 0.4, maxDim * 1.0);
             controls.target.set(0, 0, 0);
@@ -117,10 +130,6 @@
 
             function animate() {
                 requestAnimationFrame(animate);
-                
-                // Światło podąża za kamerą – model jest zawsze idealnie doświetlony z przodu
-                dirLight.position.copy(camera.position);
-                
                 controls.update();
                 renderer.render(scene, camera);
             }
