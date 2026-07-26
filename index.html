@@ -20,7 +20,7 @@
             width: 100%; 
             max-width: 400px; 
             height: 300px; 
-            background-color: #0d1117; 
+            background-color: #62686e; 
             border-radius: 6px; 
             overflow: hidden;
             cursor: grab;
@@ -69,28 +69,27 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // --- 1. OŚWIETLENIE BEZCIENIOWE (Z KAŻDEJ STRONY) ---
-        // Światło z nieba i ziemi – eliminuje czarne cienie od dołu i z boku
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2.5);
+        // --- 1. NATURALNE, UMIARKOWANE OŚWIETLENIE ---
+        // Obniżona intensywność światła otoczenia z 2.5 na 1.0
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x333333, 1.0);
         hemiLight.position.set(0, 20, 0);
         scene.add(hemiLight);
 
-        // Światło mocne wprost z pozycji kamery
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        // Lekkie światło z przodu zbalansowane z 1.5 na 0.8
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(1, 1, 2);
         scene.add(dirLight);
 
-        // --- 2. ŁADOWANIE MODELU I POPRAWKA MATERIAŁÓW ---
+        // --- 2. ZBALANSE-OWANY MATERIAŁ (Mniej rażący) ---
         const loader = new THREE.GLTFLoader();
-        
+
         loader.load('ramie_robota.glb', function (gltf) {
             const model = gltf.scene;
 
-            // Wymuszenie matowego plastiku i usunięcie sztucznych czarnych odbić
             model.traverse((child) => {
                 if (child.isMesh && child.material) {
-                    child.material.metalness = 0.1; // Wyłączenie odbić metalicznych
-                    child.material.roughness = 0.6; // Matowy plastik zamiast błyszczącego
+                    child.material.metalness = 0.0; // Całkowicie wyłączamy sztuczny błysk
+                    child.material.roughness = 0.8; // Zwiększamy szorstkość, aby zieleń nie raziła
                 }
             });
 
