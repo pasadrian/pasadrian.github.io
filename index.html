@@ -63,29 +63,39 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         
         renderer.setSize(container.clientWidth, container.clientHeight);
+        
+        // --- 1. POPRAWKA ODZWOROWANIA KOLORÓW ---
+        renderer.outputColorSpace = THREE.SRGBColorSpace; 
+        
         container.appendChild(renderer.domElement);
 
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // Wielokierunkowe oświetlenie, aby model wyglądał trójwymiarowo
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        // --- 2. ZWIĘKSZONA INTENSYWNOŚĆ OŚWIETLENIA ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
         scene.add(ambientLight);
 
-        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.0);
-        dirLight1.position.set(2, 4, 3);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.5);
+        dirLight1.position.set(5, 10, 7);
         scene.add(dirLight1);
 
-        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
-        dirLight2.position.set(-2, -2, -3);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight2.position.set(-5, -5, -5);
         scene.add(dirLight2);
 
-        // Ładowanie pliku .glb/.gltf
+        // Ładowanie pliku .glb
         const loader = new THREE.GLTFLoader();
         
-        // Zmień nazwę pliku na swój wyeksportowany model .glb
         loader.load('ramie_robota.glb', function (gltf) {
             const model = gltf.scene;
+
+            // --- 3. ROZJAŚNIENIE MATERIAŁÓW PLASTIKU ---
+            model.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    child.material.roughness = 0.4;
+                }
+            });
 
             // Automatyczne środkowanie i skalowanie kamery
             const box = new THREE.Box3().setFromObject(model);
